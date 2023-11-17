@@ -1,0 +1,29 @@
+{% extends 'wdb/base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{%  block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h1 class="mb-0">Navigation</h1>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for url, title in urls %}
+                        <a href="{% url 'list' url %}" class="list-group-item list-group-item-action">
+                            {{ title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'prep' %}" class="list-group-item list-group-item-action">
+                    Procedure (employee by post)
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'wdb/base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{%  block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h1 class="mb-0">{{ title }}</h1>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Workshop</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Arrival Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materials %}
+                            <tr>
+                                <td>{{ material.id_material }}</td>
+                                <td>{{ material.id_workshop.id_factory.address }} - {{ material.id_workshop.id_type_workshop.type_workshop }}</td>
+                                <td>{{ material.name }}</td>
+                                <td>{{ material.quantity }}</td>
+                                <td>{{ material.arrival }}</td>
+                                <td>
+                                    <form method="get" action="{% url 'update' 'materials' material.id_material %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'delete' 'materials' material.id_material %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <form method="post" action="{% url 'list' 'materials' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success">Add Client</button>
+                </form>
+            </div>
+        </div>
+        <a href="{% url 'main' %}" class="btn btn-primary mt-3">Back</a>
+    </div>
+{% endblock %}

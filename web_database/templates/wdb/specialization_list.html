@@ -1,0 +1,52 @@
+{% extends 'wdb/base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{%  block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h1 class="mb-0">{{ title }}</h1>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Specialization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for specialization in specializations %}
+                            <tr>
+                                <td>{{ specialization.id_specialization }}</td>
+                                <td>{{ specialization.specialization }}</td>
+                                <td>
+                                    <form method="get" action="{% url 'update' 'specializations' specialization.id_specialization %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'delete' 'specializations' specialization.id_specialization %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <form method="post" action="{% url 'list' 'specializations' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success">Add Client</button>
+                </form>
+            </div>
+        </div>
+        <a href="{% url 'main' %}" class="btn btn-primary mt-3">Back</a>
+    </div>
+{% endblock %}
