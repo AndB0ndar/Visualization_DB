@@ -62,7 +62,7 @@ class ModelFactory:
     def create_html(self, model_type):
         return self.htmls[model_type]
 
-    def create_model(self, model_type: str):
+    def create_model_class(self, model_type: str):
         if model_type == 'clients':
             return Client
         elif model_type == 'employees':
@@ -107,6 +107,42 @@ class ModelFactory:
             return Specialization
         elif model_type == 'employee_metallurgists':
             return EmployeeMetallurgist
+
+    def create_filter_objects(self, model_type: str, filter=None):
+        if model_type == 'clients':
+            return Client.objects.filter(name__icontains=filter)
+        elif model_type == 'employees':
+            return Employee.objects.filter(name__icontains=filter)
+        elif model_type == 'contracts':
+            return Contract.objects.filter(amount__icontains=filter)
+        elif model_type == 'state_contracts':
+            return StateContract.objects.filter(state__icontains=filter)
+        elif model_type == 'posts':
+            return Post.objects.filter(post__icontains=filter)
+        elif model_type == 'employees':
+            return Employee.objects.filter(name__icontains=filter)
+        elif model_type == 'contracts':
+            return Contract.objects.filter(name__icontains=filter)
+        elif model_type == 'warehouses':
+            return Warehouse.objects.filter(address__icontains=filter)
+        elif model_type == 'products':
+            return Product.objects.filter(title__icontains=filter)
+        elif model_type == 'factories':
+            return Factory.objects.filter(address__icontains=filter)
+        elif model_type == 'type_workshops':
+            return TypeWorkshop.objects.filter(type_workshop__icontains=filter)
+        elif model_type == 'materials':
+            return Material.objects.filter(name__icontains=filter)
+        elif model_type == 'type_equipments':
+            return TypeEquipment.objects.filter(type_equipment__icontains=filter)
+        elif model_type == 'parameters':
+            return Parameter.objects.filter(name__icontains=filter)
+        elif model_type == 'entry_parameters':
+            return EntryParameter.objects.filter(date_entry__icontains=filter)
+        elif model_type == 'transportations':
+            return Transportation.objects.filter(arrival__icontains=filter)
+        elif model_type == 'specializations':
+            return Specialization.objects.filter(specialization__icontains=filter)
 
     def create_form(self, model_type: str, data=None, instance=None):
         if model_type == 'clients':
@@ -173,14 +209,22 @@ def get_employee_by_post(post):
 
 def tables(request, model_type):
     print("TABLE==========", model_type)
-    objects = ModelFactory().create_model(model_type).objects.all()
+    objects = ModelFactory().create_model_class(model_type).objects.all()
+    search_query = request.GET.get('q')
+
+    if search_query:
+        objects =  ModelFactory().create_filter_objects(model_type, filter=search_query)
+
     context = {
         'title': ModelFactory().create_title(model_type)
         , model_type: objects
         , 'form': ModelFactory().create_form(model_type)
+        , 'search_query': search_query
     }
+
     if model_type == "warehouses":
         context[model_type] = [(warehouse, count_product(warehouse.id_warehouse), warehouse.is_not_empty()) for warehouse in objects]
+
     if request.method == 'POST':
         form = ModelFactory().create_form(model_type, data=request.POST)
         if form.is_valid():
@@ -194,14 +238,14 @@ def tables(request, model_type):
 
 
 def delete(request, model_type, model_id):
-    object = get_object_or_404(ModelFactory().create_model(model_type), pk=model_id)
+    object = get_object_or_404(ModelFactory().create_model_class(model_type), pk=model_id)
     object.delete()
     return redirect('list', model_type)
 
 
 def update(request, model_type, model_id):
     print("UPDATE=========", model_type)
-    model_class = ModelFactory().create_model(model_type)
+    model_class = ModelFactory().create_model_class(model_type)
     if model_id:
         instance = get_object_or_404(model_class, pk=model_id)
     else:
